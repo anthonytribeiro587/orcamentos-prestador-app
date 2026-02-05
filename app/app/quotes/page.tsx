@@ -113,31 +113,30 @@ export default function QuotesPage() {
                 const desc = (q.service_description || "").trim();
                 const descShort = desc.length > 90 ? desc.slice(0, 90) + "…" : desc;
 
-                return (
-                  <div
-                    key={q.id}
-                    className="rounded-xl border border-white/10 bg-white/5 p-4"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold">{title}</p>
-                        {descShort && (
-                          <p className="mt-1 text-sm opacity-75">{descShort}</p>
-                        )}
-                        <p className="mt-2 text-xs opacity-60">
-                          Criado em {formatDateBR(q.created_at)}
-                        </p>
-                      </div>
+return (
+  <Link
+    key={q.id}
+    href={`/app/quotes/${q.id}`}
+    className="block rounded-xl border border-white/10 bg-white/5 p-4 hover:bg-white/10 transition"
+  >
+    <div className="flex items-start justify-between gap-3">
+      <div className="min-w-0">
+        <p className="text-sm font-semibold">{title}</p>
+        {descShort && <p className="mt-1 text-sm opacity-75">{descShort}</p>}
+        <p className="mt-2 text-xs opacity-60">
+          Criado em {formatDateBR(q.created_at)}
+        </p>
+      </div>
 
-                      <div className="shrink-0 text-right">
-                        <p className="text-sm font-semibold">
-                          {formatBRLFromCents(q.labor_value_cents)}
-                        </p>
-                        {/* depois a gente coloca status e ações aqui */}
-                      </div>
-                    </div>
-                  </div>
-                );
+      <div className="shrink-0 text-right">
+        <p className="text-sm font-semibold">
+          {formatBRLFromCents(q.labor_value_cents)}
+        </p>
+      </div>
+    </div>
+  </Link>
+);
+
               })}
             </div>
           )}
