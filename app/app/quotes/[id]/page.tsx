@@ -19,6 +19,11 @@ type Material = {
   quantity: string | null;
 };
 
+function formatBRLFromCents(cents?: number | null) {
+  const value = (cents ?? 0) / 100;
+  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
 export default function QuoteDetailPage() {
   const supabase = getSupabaseBrowserClient();
   const params = useParams<{ id: string }>();
@@ -38,18 +43,20 @@ export default function QuoteDetailPage() {
 
     const { data: q, error: qErr } = await supabase
       .from("quotes")
-      .select("id, category_name_snapshot, service_description, labor_value_cents, needs_material, created_at")
+      .select(
+        "id, category_name_snapshot, service_description, labor_value_cents, needs_material, created_at"
+      )
       .eq("id", params.id)
       .single();
 
-    if (qErr) {
+    if (qErr || !q) {
       setLoading(false);
       return;
     }
 
     setQuote(q);
 
-    if (q?.needs_material) {
+    if (q.needs_material) {
       const { data: m } = await supabase
         .from("quote_material_items")
         .select("id, description, quantity")
@@ -86,10 +93,7 @@ export default function QuoteDetailPage() {
   }
 
   const title = quote.category_name_snapshot || "Sem categoria";
-  const value = ((quote.labor_value_cents ?? 0) / 100).toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  });
+  const value = formatBRLFromCents(quote.labor_value_cents);
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -132,15 +136,23 @@ export default function QuoteDetailPage() {
           </div>
         )}
 
-        {/* Próximos passos: PDF + WhatsApp */}
-        <div className="flex gap-2">
-          <button className="w-full rounded-lg bg-white px-4 py-2 text-sm font-medium text-black">
-            Gerar PDF (em breve)
-          </button>
-          <button className="w-full rounded-lg border border-white/10 px-4 py-2 text-sm hover:bg-white/10">
-            Enviar WhatsApp (em breve)
-          </button>
-        </div>
+<div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+  <button
+    type="button"
+    onClick={() => window.open(`/api/quotes/${quote.id}/pdf`, "_blank")}
+    className="h-11 w-full rounded-lg bg-white px-4 text-sm font-medium text-black text-center inline-flex items-center justify-center"
+  >
+    Gerar PDF
+  </button>
+
+  <button
+    type="button"
+    className="h-11 w-full rounded-lg border border-white/10 px-4 text-sm text-center inline-flex items-center justify-center hover:bg-white/10"
+  >
+    Enviar WhatsApp (em breve)
+  </button>
+</div>
+
       </div>
     </main>
   );

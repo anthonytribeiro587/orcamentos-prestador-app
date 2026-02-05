@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+
 export default function AppHome() {
-  return <main style={{ padding: 16 }}>Logado ✅</main>;
+  redirect("/app/quotes");
 }
